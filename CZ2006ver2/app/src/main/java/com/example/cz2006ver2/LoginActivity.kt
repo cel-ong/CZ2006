@@ -1,14 +1,17 @@
 package com.example.cz2006ver2
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -24,18 +27,20 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
 
 
-    private lateinit var btnSignIn: Button
+    private lateinit var btnSignIn: SignInButton
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         btnSignIn = findViewById(R.id.btnSignIn)
+//        SignInButton btnSignIn = (SignInButton) findViewById(R.id.btnSignIn)
 
         auth = Firebase.auth
 
         // Configure Google Sign In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("532184677401-h7rq8qmjm50s7opth8ljdhi3gravnbbq.apps.googleusercontent.com")
-                //^hardcorded, use (getString(R.string.default_web_client_id)) instead
+            //^hardcorded, use (getString(R.string.default_web_client_id)) instead
             .requestEmail()
             .build()
 
@@ -45,6 +50,28 @@ class LoginActivity : AppCompatActivity() {
             val signInIntent = googleSignInClient.signInIntent
             startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
 
+//            registerForActivityResult(StartActivityForResult()) { result ->
+//                onActivityResult(RC_GOOGLE_SIGN_IN, result)
+//            }.launch(signInIntent)
+
+//            val launcher =
+//                registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+//                    if (result.resultCode == Activity.RESULT_OK) {
+//                        // handle the response in result.data
+//                        val data: Intent? = result.data
+//                        val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+//                        try {
+//                            // Google Sign In was successful, authenticate with Firebase
+//                            val account = task.getResult(ApiException::class.java)!!
+//                            Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
+//                            firebaseAuthWithGoogle(account.idToken!!)
+//                        } catch (e: ApiException) {
+//                            // Google Sign In failed, update UI appropriately
+//                            Log.w(TAG, "Google sign in failed", e)
+//                        }
+//                    }
+//                }
+//            launcher.launch(signInIntent)
         }
     }
 
@@ -62,7 +89,7 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        startActivity(Intent(this, MainActivity::class.java))
+        startActivity(Intent(this, DUMMY::class.java))
         finish()
     }
 
@@ -83,6 +110,12 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+//    private fun onActivityResult(requestCode: Int, result: ActivityResult) {
+//        if(result.resultCode == Activity.RESULT_OK) {
+//            val intent = result.data
+//            when (requestCode) {
+//                Constants.MY_CODE_REQUEST -> {
+//                    ...
 
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
